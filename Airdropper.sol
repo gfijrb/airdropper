@@ -1,4 +1,4 @@
-pragma solidity 0.4.21;
+pragma solidity 0.4.24;
 
 
 /**
@@ -62,7 +62,7 @@ contract Ownable {
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
-    function Ownable() public {
+    constructor() public {
         owner = msg.sender;
     }
 
@@ -118,7 +118,7 @@ contract Airdropper is Ownable {
      * @param tokenAddress Address of the token contract.
      * @param decimals Decimals as specified by the token.
      */
-    function Airdropper(address tokenAddress, uint decimals) public {
+    constructor(address tokenAddress, uint decimals) public {
         require(decimals <= 77);  // 10**77 < 2**256-1 < 10**78
 
         token = ERC20(tokenAddress);
@@ -135,7 +135,7 @@ contract Airdropper is Ownable {
     function airdrop(address source, address[] dests, uint[] values) public onlyOwner {
         // This simple validation will catch most mistakes without consuming
         // too much gas.
-        require(dests.length == values.length);
+        require(dests.length == values.length && dests.length <= 50);
 
         for (uint256 i = 0; i < dests.length; i++) {
             require(token.transferFrom(source, dests[i], values[i].mul(multiplier)));
@@ -157,4 +157,3 @@ contract Airdropper is Ownable {
         selfdestruct(owner);
     }
 }
-
