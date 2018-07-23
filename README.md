@@ -3,7 +3,7 @@
 Airdropper contract for token bounty distribution.
 
 Parts of this implementation (`SafeMath` and `Ownable`) are taken from
-[OpenZeppelin] v1.8.0, with modification to support Solidity v0.4.21.
+[OpenZeppelin] v1.8.0, with modification to support Solidity v0.4.24.
 
 ## Why an airdropper?
 
