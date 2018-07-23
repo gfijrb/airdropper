@@ -91,8 +91,12 @@ contract Airdropper is Owned {
     constructor(address tokenAddress) public {
         token = ERC20(tokenAddress);
     }
-
-    function airdrop(/*address source, */address[] dests, uint[] values) public onlyOwner {
+    
+     /**
+      * @dev Airdrop.
+      * @ !important Before using, send needed token amount to this contract
+      */
+    function airdrop(address[] dests, uint[] values) public onlyOwner {
         // This simple validation will catch most mistakes without consuming
         // too much gas.
         require(dests.length == values.length);
