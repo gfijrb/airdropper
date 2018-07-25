@@ -22,7 +22,6 @@ library SafeMath {
     }
 }
 
-
 // ----------------------------------------------------------------------------
 // ERC Token Standard #20 Interface
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
@@ -38,17 +37,6 @@ contract ERC20 {
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
-
-
-// ----------------------------------------------------------------------------
-// Contract function to receive approval and execute function in one call
-//
-// Borrowed from MiniMeToken
-// ----------------------------------------------------------------------------
-contract ApproveAndCallFallBack {
-    function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
-}
-
 
 // ----------------------------------------------------------------------------
 // Owned contract
@@ -79,6 +67,9 @@ contract Owned {
     }
 }
 
+// ----------------------------------------------------------------------------
+// Airdropper contract
+// ----------------------------------------------------------------------------
 contract Airdropper is Owned {
     using SafeMath for uint;
 
