@@ -1,46 +1,25 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.10;
+/**
 
-// ----------------------------------------------------------------------------
-// Safe maths
-// ----------------------------------------------------------------------------
-library SafeMath {
-    function add(uint a, uint b) internal pure returns (uint c) {
-        c = a + b;
-        require(c >= a, "Add error");
-    }
-    function sub(uint a, uint b) internal pure returns (uint c) {
-        require(b <= a, "Sub error");
-        c = a - b;
-    }
-    function mul(uint a, uint b) internal pure returns (uint c) {
-        c = a * b;
-        require(a == 0 || c / a == b, "Mul error");
-    }
-    function div(uint a, uint b) internal pure returns (uint c) {
-        require(b > 0, "Div error");
-        c = a / b;
-    }
-}
+Powered by Paul Bolhar
+t.me/bolpol
 
-// ----------------------------------------------------------------------------
-// ERC Token Standard #20 Interface
-// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
-// ----------------------------------------------------------------------------
+Smart solutions and code audit.
+http://pironmind.com
+
+*/
+
+/**
+    @title ERC20 - not full eip20 compatible interface
+*/
 contract ERC20 {
-    function totalSupply() public constant returns (uint);
-    function balanceOf(address tokenOwner) public constant returns (uint balance);
-    function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
-    function transfer(address to, uint tokens) public returns (bool success);
-    function approve(address spender, uint tokens) public returns (bool success);
-    function transferFrom(address from, address to, uint tokens) public returns (bool success);
-
-    event Transfer(address indexed from, address indexed to, uint tokens);
-    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+    function balanceOf(address tokenOwner) external returns (uint balance);
+    function transfer(address to, uint tokens) external returns (bool success);
 }
 
-// ----------------------------------------------------------------------------
-// Owned contract
-// ----------------------------------------------------------------------------
+/**
+    @title Owned - ownership
+*/
 contract Owned {
     address public owner;
     address public newOwner;
@@ -59,6 +38,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -67,12 +47,10 @@ contract Owned {
     }
 }
 
-// ----------------------------------------------------------------------------
-// Airdropper contract
-// ----------------------------------------------------------------------------
+/**
+    @title Airdropper - using for package token transfer
+*/
 contract Airdropper is Owned {
-    using SafeMath for uint;
-
     ERC20 public token;
 
     /**
@@ -82,12 +60,22 @@ contract Airdropper is Owned {
     constructor(address tokenAddress) public {
         token = ERC20(tokenAddress);
     }
-    
-     /**
-      * @dev Airdrop.
-      * @ !important Before using, send needed token amount to this contract
-      */
-    function airdrop(address[] dests, uint[] values) public onlyOwner {
+
+    // + 10-20 gas lie
+    function test(address[] memory dests, uint[] memory values) public {
+        uint startGas = gasleft();
+        airdrop(dests, values);
+        uint gasUsed = startGas - gasleft();
+        log1(bytes32(block.gaslimit), 'gaslimit');
+        log1(bytes32(gasUsed), 'gasUsed');
+        revert();
+    }
+
+    /**
+     * @dev Airdrop.
+     * @ !important Before using, send needed token amount to this contract
+     */
+    function airdrop(address[] memory dests, uint[] memory values) public onlyOwner {
         // This simple validation will catch most mistakes without consuming
         // too much gas.
         require(dests.length == values.length);
@@ -102,13 +90,13 @@ contract Airdropper is Owned {
      *   transferred to this contract.
      */
     function returnTokens() public onlyOwner {
-        token.transfer(owner, token.balanceOf(this));
+        token.transfer(owner, token.balanceOf(address(this)));
     }
 
     /**
      * @dev Destroy this contract and recover any ether to the owner.
      */
     function destroy() public onlyOwner {
-        selfdestruct(owner);
+        selfdestruct(msg.sender);
     }
 }
