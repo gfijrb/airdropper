@@ -52,6 +52,8 @@ contract Owned {
 */
 contract Airdropper is Owned {
     ERC20 public token;
+    
+    event Destroyed(uint indexed _time);
 
     /**
      * @dev Constructor.
@@ -89,14 +91,17 @@ contract Airdropper is Owned {
      * @dev Return all tokens back to owner, in case any were accidentally
      *   transferred to this contract.
      */
-    function returnTokens() public onlyOwner {
-        token.transfer(owner, token.balanceOf(address(this)));
+    function returnTokens() public onlyOwner returns(bool) {
+        return token.transfer(owner, token.balanceOf(address(this)));
     }
 
     /**
      * @dev Destroy this contract and recover any ether to the owner.
      */
     function destroy() public onlyOwner {
-        selfdestruct(msg.sender);
+        if(returnTokens()) {
+            emit Destroyed(now());
+            selfdestruct(msg.sender);
+        }
     }
 }
