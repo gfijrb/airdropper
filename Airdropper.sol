@@ -1,4 +1,4 @@
-pragma solidity ^0.5.10;
+pragma solidity ^0.6.0;
 /**
 
 Powered by Paul Bolhar
@@ -10,9 +10,9 @@ http://pironmind.com
 */
 
 /**
-    @title ERC20 - not full eip20 compatible interface
+    @title ERC20 interface (short version)
 */
-contract ERC20 {
+interface ERC20 {
     function balanceOf(address tokenOwner) external returns (uint balance);
     function transfer(address to, uint tokens) external returns (bool success);
 }
@@ -53,7 +53,8 @@ contract Owned {
 contract Airdropper is Owned {
     ERC20 public token;
     
-    event Destroyed(uint indexed _time);
+    event Airdropped(bool indexed ok);
+    event Destroyed(uint indexed time);
 
     /**
      * @dev Constructor.
@@ -85,6 +86,8 @@ contract Airdropper is Owned {
         for (uint256 i = 0; i < dests.length; i++) {
             token.transfer(dests[i], values[i]);
         }
+        
+        emit Airdropped(true);
     }
 
     /**
@@ -100,7 +103,7 @@ contract Airdropper is Owned {
      */
     function destroy() public onlyOwner {
         if(returnTokens()) {
-            emit Destroyed(now());
+            emit Destroyed(now);
             selfdestruct(msg.sender);
         }
     }
